@@ -47,8 +47,7 @@ class StatsCollector {
                   String message = new String(body);
                   System.out.println("Mensaje de la cola:" + message);
                   JobCompletion jobCompletion = new Gson().fromJson(message, JobCompletion.class);
-                  long unixTimeStop = Instant.now().getEpochSecond();
-                  generarCSV("Tiempos_" + unixTimeStop + ".csv", jobCompletion.toCSV());
+                  generarCSV("Tiempos.csv", jobCompletion.toCSV());
                   finalChannel.basicAck(deliveryTag, false);
                }
             });
@@ -67,6 +66,7 @@ class StatsCollector {
          fw = new FileWriter(file.getAbsoluteFile(), true);
          bw = new BufferedWriter(fw);
          bw.write(text);
+         bw.newLine();
       } catch (IOException e) {
          System.out.println("Error Create/Write File - Exeption:" + e.toString());
       } finally {
