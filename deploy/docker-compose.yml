@@ -1,0 +1,83 @@
+version: '3.8'
+services:
+   rabbitmq-broker:
+     image: "rabbitmq:3.8.0-management-alpine"
+     container_name: rabbitmq-broker
+     ports:
+       # http://localhost:9002 panel de administración
+       - "9002:15672"
+     environment:
+       # Crea un usuario y su contraseña
+       - RABBITMQ_DEFAULT_USER=twcam-pls
+       - RABBITMQ_DEFAULT_PASS=twcam-pls
+       # Crea un VHOST
+       - RABBITMQ_DEFAULT_VHOST=Imagenes
+
+   upload-server:
+     image: "bellsoft/liberica-openjdk-alpine:17"
+     container_name: upload-server
+     ports:
+       # El servidor de upload se expone en el puerto 9000
+       - "9000:9000"
+     volumes:
+       # Mapeo de directorios en la máquina a directorios en el contenedor
+       - ./data:/data
+       - ./upload-server/app:/app
+     environment:
+       # Variables de entorno para configurar la aplicación
+       - BASE_PATH=/upload
+       - PORT=9000
+       - NTHREADS=10
+       - STORAGE_DIR=/data
+       - DOWNLOAD_SERVER_URL=http://nginx-internal
+       - UPLOAD_SERVER_URL=http://upload-server:9000/upload
+     working_dir: /app
+     command: "java -jar improc-upload-server-1.0.jar"
+
+   stats:
+     #image: "adoptopenjdk/openjdk8-openj9:jre8u232-b09_openj9-0.17.0-debian"
+     image: "bellsoft/liberica-openjdk-alpine:17"
+     container_name: stats
+     volumes:
+      # Mapeo de directorios en la máquina a directorios en el contenedor
+      - ./stats/app:/app
+      - ./stats/times:/times
+     working_dir: /app
+     command: "java -jar stats-app-1.0.jar"
+
+   worker1:
+     image: "twcammaster.uv.es/java8-opencv"
+     container_name: worker1
+     volumes:
+       # Mapeo de directorios en la máquina a directorios en el contenedor
+       - ./worker1/app:/app
+     working_dir: /app
+     command: "java -Djava.library.path=/opt/local/lib -classpath worker-opencv-app-1.0.jar Worker worker1"
+
+   worker2:
+     image: "twcammaster.uv.es/java8-opencv"
+     container_name: worker2
+     volumes:
+       # Mapeo de directorios en la máquina a directorios en el contenedor
+       - ./worker2/app:/app
+     working_dir: /app
+     command: "java -Djava.library.path=/opt/local/lib -classpath worker-opencv-app-1.0.jar Worker worker2"
+
+   nginx-internal:
+     image: "nginx:stable-alpine"
+     container_name: nginx-internal
+     volumes:
+       # Mapeo de directorios en la máquina a directorios en el contenedor
+       - ./data/blur:/usr/share/nginx/html/blur
+       - ./data/edges:/usr/share/nginx/html/edges
+       - ./data/gray:/usr/share/nginx/html/gray
+
+   nginx-external:
+     image: "nginx:stable-alpine"
+     container_name: nginx-external
+     ports:
+       # Las imágenes procesadas se exponen con este contenedor en el puerto 8080
+       - "8080:80"
+     volumes:
+       # Mapeo de directorios en la máquina a directorios en el contenedor
+       - ./data/procesadas:/usr/share/nginx/html/procesadas
