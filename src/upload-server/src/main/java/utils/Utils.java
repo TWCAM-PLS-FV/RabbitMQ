@@ -64,7 +64,7 @@ public class Utils {
             return "Trabajos";
         }else{
             if(bucket.equals("/procesadas")){
-                return "Procesadas";
+                return "/procesadas";
             }else{
                 return "N/A";
             }

@@ -3,6 +3,7 @@
 # Edit at https://www.gitignore.io/?templates=java,maven,eclipse,visualstudiocode
 
 /images
+/deploy/data*
 
 ### Eclipse ###
 .metadata

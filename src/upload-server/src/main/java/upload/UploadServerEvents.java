@@ -119,9 +119,7 @@ public class UploadServerEvents extends WebResponse {
 
                bucketType=utils.validteBucketType(bucket);
 
-               if(!bucketType.equals("procesadas")||
-               !bucketType.equals("N/A")){
-                  
+               if(!bucketType.equals("/procesadas") || !bucketType.equals("N/A")){
                   // Crear una instancia del tipo ImageEvent y asignar la información
                   long unixTime = Instant.now().getEpochSecond();
                   moveFile(path+img, "/data"+bucket+"/"+img);
@@ -140,8 +138,7 @@ public class UploadServerEvents extends WebResponse {
                   byte[] messageBody = json.getBytes();
 
                   // Usamos el canal para definir: el exchange, la cola y la asociación
-                  // exchange-cola
-                  
+                  // exchange-cola                  
                   Channel c = ConexionRabbitMQ.getChannel();
                   c.exchangeDeclare(RabbitMQConfig.EXCHANGE, "direct", true);
                   c.queueDeclare(RabbitMQConfig.COLA_TRABAJOS, true, false, false, null);
@@ -162,7 +159,8 @@ public class UploadServerEvents extends WebResponse {
                }
             }else{
                PrintWriter pw = resp.getWriter();
-               log.warn("400: BadRequest - Parámetros inválidos");
+               log.warn("400: BadRequest - Niguna acción por realizar");
+               System.out.println("Niguna acción por realizar");
                resp.setStatus(400);
                resp.setResponseHeader("Content-Type", "text/html; charset=utf-8");       
                pw.println("<h1>Código de respuesta: 400</h1>");

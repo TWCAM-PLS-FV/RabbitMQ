@@ -13,7 +13,7 @@
   </properties>
 
   <dependencies>
-    <dependency>
+    <dependency> 
       <groupId>opencv</groupId>
       <artifactId>opencv</artifactId>
       <version>3.4.2</version>
