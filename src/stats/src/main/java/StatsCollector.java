@@ -47,7 +47,7 @@ class StatsCollector {
                   String message = new String(body);
                   System.out.println("Mensaje de la cola:" + message);
                   JobCompletion jobCompletion = new Gson().fromJson(message, JobCompletion.class);
-                  generarCSV("Tiempos.csv", jobCompletion.toCSV());
+                  generarCSV("/times/Tiempos.csv", jobCompletion.toCSV());
                   finalChannel.basicAck(deliveryTag, false);
                }
             });

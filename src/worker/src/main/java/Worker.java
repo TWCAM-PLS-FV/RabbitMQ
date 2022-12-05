@@ -46,7 +46,7 @@ public class Worker {
 
       Channel finalChannel = c;
       boolean autoAck = false;
-      finalChannel.basicConsume(RabbitMQConfig.COLA_TRABAJOS, autoAck, "Worker",
+      finalChannel.basicConsume(RabbitMQConfig.COLA_TRABAJOS, autoAck, "Trabajos",
             new DefaultConsumer(c) {
                @Override
                public void handleDelivery(String consumerTag,
@@ -92,14 +92,17 @@ public class Worker {
                            case "/blur": {
                               System.out.println("Aplicando blur...");
                               imgAux = OpenCVUtils.blur(img);
+                              break;
                            }
                            case "/gray": {
                               System.out.println("Aplicando gray,..");
                               imgAux = OpenCVUtils.gray(img);
+                              break;
                            }
                            case "/edges": {
                               System.out.println("Aplicando edges...");
                               imgAux = OpenCVUtils.edges(img);
+                              break;
                            }
                         }
                      } catch (Exception e) {
@@ -144,6 +147,8 @@ public class Worker {
                      System.out.println("-------------------------");
                   } else {
                      System.out.println("Nothing to do: " + imageEvent.getAction());
+                     System.out.println("ACK...");
+                     finalChannel.basicAck(deliveryTag, false);
                   }
                }
             });
