@@ -3,6 +3,8 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DefaultConsumer;
 import com.rabbitmq.client.Envelope;
 
+import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.Instant;
@@ -46,20 +48,37 @@ class StatsCollector {
                   System.out.println("Mensaje de la cola:" + message);
                   JobCompletion jobCompletion = new Gson().fromJson(message, JobCompletion.class);
                   long unixTimeStop = Instant.now().getEpochSecond();
-                  generarCSV("Tiempos_"+unixTimeStop+".csv", jobCompletion.toCSV());
+                  generarCSV("Tiempos_" + unixTimeStop + ".csv", jobCompletion.toCSV());
                   finalChannel.basicAck(deliveryTag, false);
                }
             });
    }
 
-   public static void generarCSV(String file, String text) {
+   public static void generarCSV(String nameFile, String text) {
+      BufferedWriter bw = null;
+      FileWriter fw = null;
       try {
-         FileWriter myWriter = new FileWriter(file);
-         myWriter.write(text);
-         myWriter.close();
-         System.out.println("Se ha generado el archivo exitosamente");
+         File file = new File(nameFile);
+         // Si el archivo no existe, se crea.
+         if (!file.exists()) {
+            file.createNewFile();
+         }
+         // flag true, indica adjuntar información al archivo.
+         fw = new FileWriter(file.getAbsoluteFile(), true);
+         bw = new BufferedWriter(fw);
+         bw.write(text);
       } catch (IOException e) {
-         System.out.println("Error File - Exeption: " + e.getMessage());
+         System.out.println("Error Create/Write File - Exeption:" + e.toString());
+      } finally {
+         try {
+            // Cierra instancias de FileWriter y BufferedWriter
+            if (bw != null)
+               bw.close();
+            if (fw != null)
+               fw.close();
+         } catch (IOException e) {
+            System.out.println("Error CloseFile - Exeption:" + e.toString());
+         }
       }
    }
 
