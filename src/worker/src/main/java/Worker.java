@@ -148,7 +148,12 @@ public class Worker {
                   } else {
                      System.out.println("Nothing to do: " + imageEvent.getAction());
                      System.out.println("ACK...");
-                     finalChannel.basicAck(deliveryTag, false);
+                     try {
+                        finalChannel.basicAck(deliveryTag, false);
+                     } catch (IOException e) {
+                        System.out.println("Error FinalChannel - Exception:" + e.toString());
+                     }
+                     System.out.println("-------------------------");
                   }
                }
             });
